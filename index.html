@@ -1,147 +1,422 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>USDT Faucet</title>
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Khaled Points Faucet</title>
 
   <style>
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
+
       font-family: Arial, sans-serif;
+
       background: #101828;
+
       min-height: 100vh;
+
       display: flex;
+
       align-items: center;
+
       justify-content: center;
+
       margin: 0;
+
       padding: 20px;
     }
 
     .box {
+
       background: white;
+
       width: 100%;
+
       max-width: 420px;
+
       padding: 30px;
+
       border-radius: 20px;
+
       text-align: center;
+
+      box-shadow:
+        0 10px 30px rgba(0,0,0,0.25);
     }
 
     h1 {
+
+      margin-top: 0;
+
       margin-bottom: 10px;
     }
 
     .reward {
+
       background: #f2f4f7;
-      padding: 15px;
-      border-radius: 10px;
+
+      padding: 18px;
+
+      border-radius: 12px;
+
       margin: 20px 0;
     }
 
+    .reward strong {
+
+      font-size: 22px;
+    }
+
+    .balance {
+
+      margin: 20px 0;
+
+      padding: 20px;
+
+      background: #ecfdf3;
+
+      border-radius: 12px;
+    }
+
+    .balance-title {
+
+      font-size: 14px;
+
+      margin-bottom: 5px;
+    }
+
+    .points {
+
+      font-size: 30px;
+
+      font-weight: bold;
+    }
+
     input {
+
       width: 100%;
+
       padding: 14px;
-      box-sizing: border-box;
+
       margin-bottom: 15px;
-      border: 1px solid #ccc;
+
+      border:
+        1px solid #ccc;
+
       border-radius: 8px;
+
       font-size: 16px;
     }
 
     button {
+
       width: 100%;
+
       padding: 14px;
+
       border: 0;
+
       border-radius: 8px;
+
       background: #26a17b;
+
       color: white;
+
       font-size: 16px;
+
       font-weight: bold;
+
       cursor: pointer;
     }
 
+    button:hover {
+
+      opacity: 0.9;
+    }
+
     button:disabled {
+
       background: #999;
+
+      cursor: not-allowed;
     }
 
     #message {
+
       margin-top: 15px;
+
       font-weight: bold;
+
+      min-height: 22px;
     }
+
+    .info {
+
+      margin-top: 20px;
+
+      font-size: 13px;
+
+      color: #667085;
+    }
+
   </style>
+
 </head>
+
 
 <body>
 
   <div class="box">
 
-    <h1>USDT Faucet</h1>
+    <h1>Khaled Points Faucet</h1>
 
-    <p>Claim your free USDT reward.</p>
+    <p>
+      Claim your free points.
+    </p>
+
 
     <div class="reward">
-      Reward per claim<br>
-      <strong>0.001 USDT</strong>
+
+      Reward per claim
+
+      <br>
+
+      <strong>
+        10,000 POINTS
+      </strong>
+
     </div>
+
+
+    <div class="balance">
+
+      <div class="balance-title">
+        Your Points
+      </div>
+
+      <div class="points">
+
+        <span id="points">
+          0
+        </span>
+
+      </div>
+
+    </div>
+
 
     <input
       type="email"
       id="email"
-      placeholder="FaucetPay Email"
+      placeholder="Enter your email"
+      autocomplete="email"
     >
 
-    <button id="claimButton" onclick="claim()">
-      CLAIM USDT
+
+    <button
+      id="claimButton"
+      onclick="claim()"
+    >
+
+      CLAIM 10,000 POINTS
+
     </button>
+
 
     <div id="message"></div>
 
+
+    <div class="info">
+
+      You can claim once every 60 seconds.
+
+    </div>
+
   </div>
+
 
   <script>
 
     const WORKER_URL =
       "https://khaled-usdt-faucet.khaledalhadi26.workers.dev/";
 
-    async function claim() {
 
-      const email =
-        document.getElementById("email").value.trim();
+    const emailInput =
+      document.getElementById("email");
 
-      const button =
-        document.getElementById("claimButton");
+    const pointsElement =
+      document.getElementById("points");
 
-      const message =
-        document.getElementById("message");
+    const button =
+      document.getElementById("claimButton");
 
-      if (!email || !email.includes("@")) {
-        message.textContent =
-          "Please enter a valid FaucetPay email.";
-        return;
-      }
+    const message =
+      document.getElementById("message");
 
-      button.disabled = true;
-      button.textContent = "PROCESSING...";
+
+    // استرجاع الإيميل السابق
+    const savedEmail =
+      localStorage.getItem("khaledEmail");
+
+    if (savedEmail) {
+
+      emailInput.value =
+        savedEmail;
+
+      loadBalance(savedEmail);
+    }
+
+
+    async function loadBalance(email) {
+
+      /*
+        هذه النسخة تستخدم POST للحصول
+        على الرصيد من نفس Worker.
+      */
 
       try {
 
-        const response = await fetch(WORKER_URL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            email: email
-          })
-        });
+        const response =
+          await fetch(WORKER_URL, {
 
-        const result = await response.json();
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
+
+            body: JSON.stringify({
+              email: email,
+              action: "balance"
+            })
+
+          });
+
+      } catch (error) {
+
+        // لا شيء
+      }
+    }
+
+
+    async function claim() {
+
+      const email =
+        emailInput.value
+          .trim()
+          .toLowerCase();
+
+
+      if (
+        !email ||
+        !email.includes("@")
+      ) {
+
+        message.textContent =
+          "Please enter a valid email.";
+
+        return;
+      }
+
+
+      localStorage.setItem(
+        "khaledEmail",
+        email
+      );
+
+
+      button.disabled = true;
+
+      button.textContent =
+        "PROCESSING...";
+
+      message.textContent =
+        "";
+
+
+      try {
+
+        const response =
+          await fetch(WORKER_URL, {
+
+            method: "POST",
+
+            headers: {
+
+              "Content-Type":
+                "application/json"
+
+            },
+
+            body: JSON.stringify({
+
+              email: email
+
+            })
+
+          });
+
+
+        const result =
+          await response.json();
+
 
         if (result.success) {
+
+          pointsElement.textContent =
+            Number(result.points)
+              .toLocaleString();
+
+
           message.textContent =
-            "Request received successfully.";
+            "🎉 You received 10,000 points!";
+
+          startCooldown(
+            result.cooldown || 60
+          );
+
         } else {
+
+          if (result.points !== undefined) {
+
+            pointsElement.textContent =
+              Number(result.points)
+                .toLocaleString();
+
+          }
+
+
           message.textContent =
-            result.message || "Request failed.";
+            result.message ||
+            "Request failed.";
+
+
+          if (result.cooldown) {
+
+            startCooldown(
+              result.cooldown
+            );
+
+          } else {
+
+            button.disabled = false;
+
+            button.textContent =
+              "CLAIM 10,000 POINTS";
+          }
+
         }
 
       } catch (error) {
@@ -149,13 +424,51 @@
         message.textContent =
           "Unable to connect to the server.";
 
+        button.disabled = false;
+
+        button.textContent =
+          "CLAIM 10,000 POINTS";
       }
 
-      button.disabled = false;
-      button.textContent = "CLAIM USDT";
+    }
+
+
+    function startCooldown(seconds) {
+
+      let remaining =
+        Number(seconds);
+
+
+      button.disabled = true;
+
+
+      const timer =
+        setInterval(() => {
+
+          if (remaining <= 0) {
+
+            clearInterval(timer);
+
+            button.disabled = false;
+
+            button.textContent =
+              "CLAIM 10,000 POINTS";
+
+            return;
+          }
+
+
+          button.textContent =
+            `WAIT ${remaining}s`;
+
+          remaining--;
+
+        }, 1000);
+
     }
 
   </script>
 
 </body>
+
 </html>
