@@ -3,424 +3,697 @@
 
 <head>
 
-  <meta charset="UTF-8">
+<meta charset="UTF-8">
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
 
-  <title>Khaled Points Faucet</title>
+<title>Khaled Faucet</title>
 
-  <style>
+<style>
 
-    * {
-      box-sizing: border-box;
-    }
+body {
+    font-family: Arial, sans-serif;
+    background: #f2f4f7;
+    margin: 0;
+    padding: 30px;
+}
 
-    body {
-      font-family: Arial, sans-serif;
-      background: #101828;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0;
-      padding: 20px;
-    }
+.container {
+    max-width: 450px;
+    margin: auto;
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+}
 
-    .box {
-      background: white;
-      width: 100%;
-      max-width: 420px;
-      padding: 30px;
-      border-radius: 20px;
-      text-align: center;
-      box-shadow:
-        0 10px 30px rgba(0,0,0,0.25);
-    }
+h1 {
+    text-align: center;
+}
 
-    h1 {
-      margin-top: 0;
-      margin-bottom: 10px;
-    }
+input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 13px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+}
 
-    .reward {
-      background: #f2f4f7;
-      padding: 18px;
-      border-radius: 12px;
-      margin: 20px 0;
-    }
+button {
+    width: 100%;
+    padding: 13px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 8px;
+}
 
-    .reward strong {
-      font-size: 22px;
-    }
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
 
-    .balance {
-      background: #ecfdf3;
-      padding: 20px;
-      border-radius: 12px;
-      margin: 20px 0;
-    }
+.send {
+    background: #222;
+    color: white;
+}
 
-    .balance-title {
-      font-size: 14px;
-      margin-bottom: 5px;
-    }
+.verify {
+    background: #1769aa;
+    color: white;
+}
 
-    .points {
-      font-size: 30px;
-      font-weight: bold;
-    }
+.claim {
+    background: #16a34a;
+    color: white;
+}
 
-    input {
-      width: 100%;
-      padding: 14px;
-      margin-bottom: 15px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 16px;
-    }
+.card {
+    margin-top: 20px;
+    padding: 20px;
+    background: #f7f7f7;
+    border-radius: 10px;
+    text-align: center;
+}
 
-    button {
-      width: 100%;
-      padding: 14px;
-      border: 0;
-      border-radius: 8px;
-      background: #26a17b;
-      color: white;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-    }
+.points {
+    font-size: 30px;
+    font-weight: bold;
+}
 
-    button:disabled {
-      background: #999;
-      cursor: not-allowed;
-    }
+.hidden {
+    display: none;
+}
 
-    #message {
-      margin-top: 15px;
-      font-weight: bold;
-      min-height: 22px;
-    }
+.message {
+    margin-top: 15px;
+    text-align: center;
+}
 
-    .info {
-      margin-top: 20px;
-      font-size: 13px;
-      color: #667085;
-    }
-
-  </style>
+</style>
 
 </head>
 
+
 <body>
 
-  <div class="box">
+<div class="container">
 
-    <h1>Khaled Points Faucet</h1>
+<h1>Khaled Faucet</h1>
 
-    <p>
-      Claim your free points.
-    </p>
-
-    <div class="reward">
-
-      Reward per claim
-
-      <br>
-
-      <strong>
-        10,000 POINTS
-      </strong>
-
-    </div>
-
-    <div class="balance">
-
-      <div class="balance-title">
-        Your Points
-      </div>
-
-      <div class="points">
-        <span id="points">0</span>
-      </div>
-
-    </div>
-
-    <input
-      type="email"
-      id="email"
-      placeholder="Enter your email"
-      autocomplete="email"
-    >
-
-    <button
-      id="claimButton"
-      onclick="claim()"
-    >
-      CLAIM 10,000 POINTS
-    </button>
-
-    <div id="message"></div>
-
-    <div class="info">
-      One claim every 60 seconds.
-    </div>
-
-  </div>
+<p style="text-align:center;">
+Verify your FaucetPay email and earn points.
+</p>
 
 
-  <script>
+<!-- EMAIL -->
 
-    const WORKER_URL =
-      "https://khaled-usdt-faucet.khaledalhadi26.workers.dev/";
+<div id="emailSection">
+
+<label>FaucetPay Email</label>
+
+<input
+id="email"
+type="email"
+placeholder="you@example.com"
+autocomplete="email"
+>
+
+<button
+class="send"
+id="sendOtp"
+onclick="sendOTP()"
+>
+Send Verification Code
+</button>
+
+</div>
 
 
-    const emailInput =
-      document.getElementById("email");
+<!-- OTP -->
 
-    const pointsElement =
-      document.getElementById("points");
+<div id="otpSection" class="hidden">
 
-    const button =
-      document.getElementById("claimButton");
+<label>Verification Code</label>
 
-    const message =
-      document.getElementById("message");
+<input
+id="otp"
+type="text"
+inputmode="numeric"
+maxlength="6"
+placeholder="6-digit code"
+>
+
+<button
+class="verify"
+id="verifyOtp"
+onclick="verifyOTP()"
+>
+Verify Email
+</button>
+
+<button
+onclick="sendOTP()"
+>
+Send Code Again
+</button>
+
+</div>
 
 
-    // =========================
-    // تحميل الرصيد
-    // =========================
+<!-- USER -->
 
-    async function loadBalance() {
+<div id="userSection" class="hidden">
 
-      const email =
+<div class="card">
+
+<div>Your Points</div>
+
+<div
+class="points"
+id="points"
+>
+0
+</div>
+
+</div>
+
+
+<button
+class="claim"
+id="claimButton"
+onclick="claim()"
+>
+Claim 10,000 Points
+</button>
+
+
+<div
+id="cooldown"
+class="message"
+>
+</div>
+
+</div>
+
+
+<div
+id="message"
+class="message"
+>
+</div>
+
+
+</div>
+
+
+<script>
+
+const API =
+"https://khaled-usdt-faucet.khaledalhadi26.workers.dev";
+
+
+let session =
+localStorage.getItem("khaled_session");
+
+
+let savedEmail =
+localStorage.getItem("khaled_email");
+
+
+const emailInput =
+document.getElementById("email");
+
+
+if (savedEmail) {
+
+    emailInput.value = savedEmail;
+}
+
+
+function showMessage(text) {
+
+    document.getElementById("message")
+        .textContent = text;
+}
+
+
+async function sendOTP() {
+
+    const email =
         emailInput.value.trim().toLowerCase();
 
-      if (!email || !email.includes("@")) {
+
+    if (!email || !email.includes("@")) {
+
+        showMessage("Please enter a valid email.");
+
         return;
-      }
-
-      try {
-
-        const response =
-          await fetch(WORKER_URL, {
-
-            method: "POST",
-
-            headers: {
-              "Content-Type":
-                "application/json"
-            },
-
-            body: JSON.stringify({
-              email: email,
-              action: "balance"
-            })
-
-          });
-
-
-        const result =
-          await response.json();
-
-
-        if (result.success) {
-
-          pointsElement.textContent =
-            Number(result.points)
-              .toLocaleString();
-
-        }
-
-      } catch (error) {
-
-        console.log(error);
-
-      }
     }
 
 
-    // =========================
-    // Claim
-    // =========================
-
-    async function claim() {
-
-      const email =
-        emailInput.value
-          .trim()
-          .toLowerCase();
-
-
-      if (!email || !email.includes("@")) {
-
-        message.textContent =
-          "Please enter a valid email.";
-
-        return;
-      }
-
-
-      localStorage.setItem(
-        "khaledEmail",
+    localStorage.setItem(
+        "khaled_email",
         email
-      );
+    );
 
 
-      button.disabled = true;
+    const button =
+        document.getElementById("sendOtp");
 
-      button.textContent =
-        "PROCESSING...";
+    button.disabled = true;
 
-      message.textContent =
-        "";
+    showMessage("Sending verification code...");
 
 
-      try {
+    try {
 
         const response =
-          await fetch(WORKER_URL, {
+            await fetch(API, {
 
-            method: "POST",
+                method: "POST",
 
-            headers: {
-              "Content-Type":
-                "application/json"
-            },
+                headers: {
+                    "Content-Type": "application/json"
+                },
 
-            body: JSON.stringify({
-              email: email
-            })
+                body: JSON.stringify({
 
-          });
+                    action: "send_otp",
 
+                    email: email
 
-        const result =
-          await response.json();
+                })
 
-
-        if (result.points !== undefined) {
-
-          pointsElement.textContent =
-            Number(result.points)
-              .toLocaleString();
-
-        }
+            });
 
 
-        if (result.success) {
+        const data =
+            await response.json();
 
-          message.textContent =
-            "🎉 You received 10,000 points!";
 
-          startCooldown(
-            result.cooldown || 60
-          );
+        if (!data.success) {
 
-        } else {
-
-          message.textContent =
-            result.message ||
-            "Request failed.";
-
-          if (result.cooldown) {
-
-            startCooldown(
-              result.cooldown
+            showMessage(
+                data.error || "Failed to send code."
             );
-
-          } else {
 
             button.disabled = false;
 
-            button.textContent =
-              "CLAIM 10,000 POINTS";
-
-          }
-
+            return;
         }
 
-      } catch (error) {
 
-        message.textContent =
-          "Unable to connect to the server.";
+        document
+            .getElementById("emailSection")
+            .classList.add("hidden");
+
+
+        document
+            .getElementById("otpSection")
+            .classList.remove("hidden");
+
+
+        showMessage(
+            "Verification code sent to your email."
+        );
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        showMessage(
+            "Connection error."
+        );
+
+        button.disabled = false;
+    }
+
+}
+
+
+async function verifyOTP() {
+
+    const email =
+        emailInput.value.trim().toLowerCase();
+
+
+    const otp =
+        document.getElementById("otp")
+            .value.trim();
+
+
+    if (!/^\d{6}$/.test(otp)) {
+
+        showMessage(
+            "Enter the 6-digit code."
+        );
+
+        return;
+    }
+
+
+    showMessage(
+        "Verifying..."
+    );
+
+
+    try {
+
+        const response =
+            await fetch(API, {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+
+                    action: "verify_otp",
+
+                    email: email,
+
+                    otp: otp
+
+                })
+
+            });
+
+
+        const data =
+            await response.json();
+
+
+        if (!data.success) {
+
+            showMessage(
+                data.error || "Verification failed."
+            );
+
+            return;
+        }
+
+
+        session =
+            data.session;
+
+
+        localStorage.setItem(
+            "khaled_session",
+            session
+        );
+
+
+        document
+            .getElementById("otpSection")
+            .classList.add("hidden");
+
+
+        document
+            .getElementById("userSection")
+            .classList.remove("hidden");
+
+
+        document
+            .getElementById("emailSection")
+            .classList.add("hidden");
+
+
+        showMessage(
+            "Email verified successfully!"
+        );
+
+
+        updateBalance();
+
+    } catch (error) {
+
+        console.error(error);
+
+        showMessage(
+            "Connection error."
+        );
+    }
+
+}
+
+
+async function updateBalance() {
+
+    if (!session) {
+        return;
+    }
+
+
+    try {
+
+        const response =
+            await fetch(API, {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+
+                    action: "balance",
+
+                    session: session
+
+                })
+
+            });
+
+
+        const data =
+            await response.json();
+
+
+        if (!data.success) {
+
+            localStorage.removeItem(
+                "khaled_session"
+            );
+
+            session = null;
+
+            location.reload();
+
+            return;
+        }
+
+
+        document
+            .getElementById("points")
+            .textContent =
+            Number(data.points)
+                .toLocaleString();
+
+
+        updateCooldown(
+            data.cooldown
+        );
+
+
+    } catch (error) {
+
+        console.error(error);
+    }
+
+}
+
+
+async function claim() {
+
+    if (!session) {
+
+        showMessage(
+            "Please verify your email first."
+        );
+
+        return;
+    }
+
+
+    const button =
+        document.getElementById("claimButton");
+
+
+    button.disabled = true;
+
+
+    try {
+
+        const response =
+            await fetch(API, {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+
+                    action: "claim",
+
+                    session: session
+
+                })
+
+            });
+
+
+        const data =
+            await response.json();
+
+
+        if (!data.success) {
+
+            showMessage(
+                data.error || "Claim failed."
+            );
+
+            updateCooldown(
+                data.cooldown || 0
+            );
+
+            return;
+        }
+
+
+        document
+            .getElementById("points")
+            .textContent =
+            Number(data.points)
+                .toLocaleString();
+
+
+        showMessage(
+            "+10,000 points added!"
+        );
+
+
+        updateCooldown(
+            data.cooldown
+        );
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        showMessage(
+            "Connection error."
+        );
+
+    } finally {
 
         button.disabled = false;
 
-        button.textContent =
-          "CLAIM 10,000 POINTS";
-      }
+    }
 
+}
+
+
+function updateCooldown(seconds) {
+
+    const button =
+        document.getElementById("claimButton");
+
+    const display =
+        document.getElementById("cooldown");
+
+
+    if (!seconds || seconds <= 0) {
+
+        button.disabled = false;
+
+        display.textContent =
+            "You can claim now.";
+
+        return;
     }
 
 
-    // =========================
-    // المؤقت
-    // =========================
-
-    function startCooldown(seconds) {
-
-      let remaining =
-        Number(seconds);
-
-      button.disabled = true;
+    button.disabled = true;
 
 
-      const timer =
+    let remaining =
+        seconds;
+
+
+    display.textContent =
+        `Next claim in ${remaining} seconds`;
+
+
+    const timer =
         setInterval(() => {
 
-          if (remaining <= 0) {
-
-            clearInterval(timer);
-
-            button.disabled = false;
-
-            button.textContent =
-              "CLAIM 10,000 POINTS";
-
-            return;
-          }
+            remaining--;
 
 
-          button.textContent =
-            `WAIT ${remaining}s`;
+            if (remaining <= 0) {
 
-          remaining--;
+                clearInterval(timer);
+
+                button.disabled = false;
+
+                display.textContent =
+                    "You can claim now.";
+
+                return;
+            }
+
+
+            display.textContent =
+                `Next claim in ${remaining} seconds`;
 
         }, 1000);
 
+}
+
+
+async function restoreSession() {
+
+    if (!session) {
+        return;
     }
 
 
-    // =========================
-    // حفظ الإيميل
-    // =========================
-
-    const savedEmail =
-      localStorage.getItem("khaledEmail");
+    document
+        .getElementById("emailSection")
+        .classList.add("hidden");
 
 
-    if (savedEmail) {
-
-      emailInput.value =
-        savedEmail;
-
-      loadBalance();
-
-    }
+    document
+        .getElementById("otpSection")
+        .classList.add("hidden");
 
 
-    // تحميل الرصيد عند تغيير الإيميل
-    emailInput.addEventListener(
-      "change",
-      loadBalance
-    );
+    document
+        .getElementById("userSection")
+        .classList.remove("hidden");
 
-  </script>
+
+    await updateBalance();
+
+}
+
+
+restoreSession();
+
+</script>
 
 </body>
 
