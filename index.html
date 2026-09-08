@@ -19,161 +19,101 @@
     }
 
     body {
-
       font-family: Arial, sans-serif;
-
       background: #101828;
-
       min-height: 100vh;
-
       display: flex;
-
       align-items: center;
-
       justify-content: center;
-
       margin: 0;
-
       padding: 20px;
     }
 
     .box {
-
       background: white;
-
       width: 100%;
-
       max-width: 420px;
-
       padding: 30px;
-
       border-radius: 20px;
-
       text-align: center;
-
       box-shadow:
         0 10px 30px rgba(0,0,0,0.25);
     }
 
     h1 {
-
       margin-top: 0;
-
       margin-bottom: 10px;
     }
 
     .reward {
-
       background: #f2f4f7;
-
       padding: 18px;
-
       border-radius: 12px;
-
       margin: 20px 0;
     }
 
     .reward strong {
-
       font-size: 22px;
     }
 
     .balance {
-
-      margin: 20px 0;
-
-      padding: 20px;
-
       background: #ecfdf3;
-
+      padding: 20px;
       border-radius: 12px;
+      margin: 20px 0;
     }
 
     .balance-title {
-
       font-size: 14px;
-
       margin-bottom: 5px;
     }
 
     .points {
-
       font-size: 30px;
-
       font-weight: bold;
     }
 
     input {
-
       width: 100%;
-
       padding: 14px;
-
       margin-bottom: 15px;
-
-      border:
-        1px solid #ccc;
-
+      border: 1px solid #ccc;
       border-radius: 8px;
-
       font-size: 16px;
     }
 
     button {
-
       width: 100%;
-
       padding: 14px;
-
       border: 0;
-
       border-radius: 8px;
-
       background: #26a17b;
-
       color: white;
-
       font-size: 16px;
-
       font-weight: bold;
-
       cursor: pointer;
     }
 
-    button:hover {
-
-      opacity: 0.9;
-    }
-
     button:disabled {
-
       background: #999;
-
       cursor: not-allowed;
     }
 
     #message {
-
       margin-top: 15px;
-
       font-weight: bold;
-
       min-height: 22px;
     }
 
     .info {
-
       margin-top: 20px;
-
       font-size: 13px;
-
       color: #667085;
     }
 
   </style>
 
 </head>
-
 
 <body>
 
@@ -184,7 +124,6 @@
     <p>
       Claim your free points.
     </p>
-
 
     <div class="reward">
 
@@ -198,7 +137,6 @@
 
     </div>
 
-
     <div class="balance">
 
       <div class="balance-title">
@@ -206,15 +144,10 @@
       </div>
 
       <div class="points">
-
-        <span id="points">
-          0
-        </span>
-
+        <span id="points">0</span>
       </div>
 
     </div>
-
 
     <input
       type="email"
@@ -223,24 +156,17 @@
       autocomplete="email"
     >
 
-
     <button
       id="claimButton"
       onclick="claim()"
     >
-
       CLAIM 10,000 POINTS
-
     </button>
-
 
     <div id="message"></div>
 
-
     <div class="info">
-
-      You can claim once every 60 seconds.
-
+      One claim every 60 seconds.
     </div>
 
   </div>
@@ -265,25 +191,18 @@
       document.getElementById("message");
 
 
-    // استرجاع الإيميل السابق
-    const savedEmail =
-      localStorage.getItem("khaledEmail");
+    // =========================
+    // تحميل الرصيد
+    // =========================
 
-    if (savedEmail) {
+    async function loadBalance() {
 
-      emailInput.value =
-        savedEmail;
+      const email =
+        emailInput.value.trim().toLowerCase();
 
-      loadBalance(savedEmail);
-    }
-
-
-    async function loadBalance(email) {
-
-      /*
-        هذه النسخة تستخدم POST للحصول
-        على الرصيد من نفس Worker.
-      */
+      if (!email || !email.includes("@")) {
+        return;
+      }
 
       try {
 
@@ -304,12 +223,30 @@
 
           });
 
+
+        const result =
+          await response.json();
+
+
+        if (result.success) {
+
+          pointsElement.textContent =
+            Number(result.points)
+              .toLocaleString();
+
+        }
+
       } catch (error) {
 
-        // لا شيء
+        console.log(error);
+
       }
     }
 
+
+    // =========================
+    // Claim
+    // =========================
 
     async function claim() {
 
@@ -319,10 +256,7 @@
           .toLowerCase();
 
 
-      if (
-        !email ||
-        !email.includes("@")
-      ) {
+      if (!email || !email.includes("@")) {
 
         message.textContent =
           "Please enter a valid email.";
@@ -354,16 +288,12 @@
             method: "POST",
 
             headers: {
-
               "Content-Type":
                 "application/json"
-
             },
 
             body: JSON.stringify({
-
               email: email
-
             })
 
           });
@@ -373,12 +303,16 @@
           await response.json();
 
 
-        if (result.success) {
+        if (result.points !== undefined) {
 
           pointsElement.textContent =
             Number(result.points)
               .toLocaleString();
 
+        }
+
+
+        if (result.success) {
 
           message.textContent =
             "🎉 You received 10,000 points!";
@@ -389,19 +323,9 @@
 
         } else {
 
-          if (result.points !== undefined) {
-
-            pointsElement.textContent =
-              Number(result.points)
-                .toLocaleString();
-
-          }
-
-
           message.textContent =
             result.message ||
             "Request failed.";
-
 
           if (result.cooldown) {
 
@@ -415,6 +339,7 @@
 
             button.textContent =
               "CLAIM 10,000 POINTS";
+
           }
 
         }
@@ -433,11 +358,14 @@
     }
 
 
+    // =========================
+    // المؤقت
+    // =========================
+
     function startCooldown(seconds) {
 
       let remaining =
         Number(seconds);
-
 
       button.disabled = true;
 
@@ -466,6 +394,31 @@
         }, 1000);
 
     }
+
+
+    // =========================
+    // حفظ الإيميل
+    // =========================
+
+    const savedEmail =
+      localStorage.getItem("khaledEmail");
+
+
+    if (savedEmail) {
+
+      emailInput.value =
+        savedEmail;
+
+      loadBalance();
+
+    }
+
+
+    // تحميل الرصيد عند تغيير الإيميل
+    emailInput.addEventListener(
+      "change",
+      loadBalance
+    );
 
   </script>
 
