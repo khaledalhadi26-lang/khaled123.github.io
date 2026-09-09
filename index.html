@@ -87,6 +87,11 @@ button:disabled {
     color: white;
 }
 
+.withdraw {
+    background: #f59e0b;
+    color: white;
+}
+
 .card {
     margin-top: 20px;
     padding: 20px;
@@ -99,6 +104,12 @@ button:disabled {
     font-size: 30px;
     font-weight: bold;
     margin-top: 10px;
+}
+
+.usdt {
+    margin-top: 10px;
+    font-size: 16px;
+    color: #555;
 }
 
 .message {
@@ -218,7 +229,7 @@ class="points"
 </div>
 
 <div class="small">
-+100,000,000 points per claim
+100,000,000 points = 1 USDT
 </div>
 
 </div>
@@ -233,10 +244,24 @@ Claim 100,000,000 Points
 </button>
 
 
+<button
+id="withdrawButton"
+class="withdraw"
+onclick="withdraw()"
+>
+Withdraw USDT
+</button>
+
+
 <div
 id="cooldown"
 class="message"
 >
+</div>
+
+
+<div class="small">
+Minimum withdrawal: 100,000,000 points
 </div>
 
 </div>
@@ -299,8 +324,10 @@ async function sendOTP() {
             .toLowerCase();
 
 
-    if (!email ||
-        !email.includes("@")) {
+    if (
+        !email ||
+        !email.includes("@")
+    ) {
 
         showMessage(
             "Please enter a valid email."
@@ -345,9 +372,11 @@ async function sendOTP() {
 
                 body: JSON.stringify({
 
-                    action: "send_otp",
+                    action:
+                        "send_otp",
 
-                    email: email
+                    email:
+                        email
 
                 })
 
@@ -465,9 +494,11 @@ async function verifyOTP() {
                     action:
                         "verify_otp",
 
-                    email: email,
+                    email:
+                        email,
 
-                    otp: otp
+                    otp:
+                        otp
 
                 })
 
@@ -570,7 +601,8 @@ async function updateBalance() {
 
                 body: JSON.stringify({
 
-                    action: "balance",
+                    action:
+                        "balance",
 
                     session:
                         session
@@ -656,7 +688,8 @@ async function claim() {
 
                 body: JSON.stringify({
 
-                    action: "claim",
+                    action:
+                        "claim",
 
                     session:
                         session
@@ -722,6 +755,105 @@ async function claim() {
 }
 
 
+async function withdraw() {
+
+    if (!session) {
+
+        showMessage(
+            "Please verify your email first."
+        );
+
+        return;
+
+    }
+
+
+    const button =
+        document.getElementById(
+            "withdrawButton"
+        );
+
+
+    button.disabled = true;
+
+
+    showMessage(
+        "Processing withdrawal..."
+    );
+
+
+    try {
+
+        const response =
+            await fetch(API, {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
+
+                body: JSON.stringify({
+
+                    action:
+                        "withdraw",
+
+                    session:
+                        session
+
+                })
+
+            });
+
+
+        const data =
+            await response.json();
+
+
+        if (!data.success) {
+
+            showMessage(
+                data.error ||
+                "Withdrawal failed."
+            );
+
+            return;
+
+        }
+
+
+        document
+            .getElementById("points")
+            .textContent =
+            Number(data.points)
+                .toLocaleString();
+
+
+        showMessage(
+            "Withdrawal successful: " +
+            data.usdt +
+            " USDT"
+        );
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        showMessage(
+            "Connection error."
+        );
+
+    } finally {
+
+        button.disabled = false;
+
+    }
+
+}
+
+
 function updateCooldown(seconds) {
 
     const button =
@@ -736,8 +868,10 @@ function updateCooldown(seconds) {
         );
 
 
-    if (!seconds ||
-        seconds <= 0) {
+    if (
+        !seconds ||
+        seconds <= 0
+    ) {
 
         button.disabled = false;
 
